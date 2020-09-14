@@ -3,16 +3,20 @@
  * if exists. As much as possible, this helper should be avoided, and used only
  * in cases where isolated behaviors need remote access to a block node.
  *
- * @param {string} clientId Block client ID.
+ * @param {string}   clientId Block client ID.
+ * @param {Document} scope
  *
  * @return {Element} Block DOM node.
  */
-export function getBlockDOMNode( clientId ) {
-	return document.getElementById( 'block-' + clientId );
+export function getBlockDOMNode(
+	clientId,
+	scope = window.frames[ 'editor-content' ].document
+) {
+	return scope.getElementById( 'block-' + clientId );
 }
 
-export function getBlockPreviewContainerDOMNode( clientId ) {
-	const domNode = getBlockDOMNode( clientId );
+export function getBlockPreviewContainerDOMNode( clientId, scope ) {
+	const domNode = getBlockDOMNode( clientId, scope );
 
 	if ( ! domNode ) {
 		return;

@@ -147,8 +147,12 @@ describe( 'Links', () => {
 		// Type a URL
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// Click somewhere else - it doesn't really matter where
-		await page.click( '.editor-post-title' );
+		await frame.click( '.editor-post-title' );
 	} );
 
 	const createAndReselectLink = async () => {
@@ -277,7 +281,10 @@ describe( 'Links', () => {
 
 	const createPostWithTitle = async ( titleText ) => {
 		await createNewPost();
-		await page.type( '.editor-post-title__input', titleText );
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+		await frame.type( '.editor-post-title__input', titleText );
 		await page.click( '.editor-post-publish-panel__toggle' );
 
 		// Disable reason: Wait for the animation to complete, since otherwise the

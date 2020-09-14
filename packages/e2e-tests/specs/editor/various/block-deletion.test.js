@@ -111,11 +111,15 @@ describe( 'block deletion -', () => {
 			await page.keyboard.type( '/image' );
 			await page.keyboard.press( 'Enter' );
 
+			const frame = await page
+				.frames()
+				.find( ( f ) => f.name() === 'editor-content' );
+
 			// Click on something that's not a block.
-			await page.click( '.editor-post-title' );
+			await frame.click( '.editor-post-title' );
 
 			// Click on the image block so that its wrapper is selected and backspace to delete it.
-			await page.click(
+			await frame.click(
 				'.wp-block[data-type="core/image"] .components-placeholder__label'
 			);
 			await page.keyboard.press( 'Backspace' );
@@ -163,9 +167,13 @@ describe( 'deleting all blocks', () => {
 
 		await clickOnBlockSettingsMenuRemoveBlockButton();
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// There is a default block:
 		expect(
-			await page.$$( '.block-editor-block-list__block' )
+			await frame.$$( '.block-editor-block-list__block' )
 		).toHaveLength( 1 );
 
 		// But the effective saved content is still empty:

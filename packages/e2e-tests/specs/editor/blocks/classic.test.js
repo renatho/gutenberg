@@ -25,10 +25,13 @@ describe( 'Classic', () => {
 
 	it( 'should be inserted', async () => {
 		await insertBlock( 'Classic' );
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
 		// Wait for TinyMCE to initialise.
-		await page.waitForSelector( '.mce-content-body' );
+		await frame.waitForSelector( '.mce-content-body' );
 		// Ensure there is focus.
-		await page.focus( '.mce-content-body' );
+		await frame.focus( '.mce-content-body' );
 		await page.keyboard.type( 'test' );
 		// Move focus away.
 		await pressKeyWithModifier( 'shift', 'Tab' );
@@ -38,10 +41,13 @@ describe( 'Classic', () => {
 
 	it( 'should insert media, convert to blocks, and undo in one step', async () => {
 		await insertBlock( 'Classic' );
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
 		// Wait for TinyMCE to initialise.
-		await page.waitForSelector( '.mce-content-body' );
+		await frame.waitForSelector( '.mce-content-body' );
 		// Ensure there is focus.
-		await page.focus( '.mce-content-body' );
+		await frame.focus( '.mce-content-body' );
 		await page.keyboard.type( 'test' );
 
 		// Click the image button.
@@ -75,7 +81,7 @@ describe( 'Classic', () => {
 		await page.click( '.media-modal button.media-button-insert' );
 
 		// Wait for image to be inserted.
-		await page.waitForSelector( '.mce-content-body img' );
+		await frame.waitForSelector( '.mce-content-body img' );
 
 		// Move focus away and verify gallery was inserted.
 		await pressKeyWithModifier( 'shift', 'Tab' );
@@ -86,7 +92,7 @@ describe( 'Classic', () => {
 		// Convert to blocks and verify it worked correctly.
 		await clickBlockToolbarButton( 'More options' );
 		await clickButton( 'Convert to Blocks' );
-		await page.waitForSelector( '.wp-block[data-type="core/gallery"]' );
+		await frame.waitForSelector( '.wp-block[data-type="core/gallery"]' );
 		expect( await getEditedPostContent() ).toMatch( /<!-- wp:gallery/ );
 
 		// Check that you can undo back to a Classic block gallery in one step.
@@ -98,7 +104,7 @@ describe( 'Classic', () => {
 		// Convert to blocks again and verify it worked correctly.
 		await clickBlockToolbarButton( 'More options' );
 		await clickButton( 'Convert to Blocks' );
-		await page.waitForSelector( '.wp-block[data-type="core/gallery"]' );
+		await frame.waitForSelector( '.wp-block[data-type="core/gallery"]' );
 		expect( await getEditedPostContent() ).toMatch( /<!-- wp:gallery/ );
 	} );
 } );

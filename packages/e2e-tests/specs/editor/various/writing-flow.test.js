@@ -37,8 +37,11 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/columns' );
 		await page.keyboard.press( 'Enter' );
-		await page.click( ':focus [aria-label="Two columns; equal split"]' );
-		await page.click( ':focus .block-editor-button-block-appender' );
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+		await frame.click( ':focus [aria-label="Two columns; equal split"]' );
+		await frame.click( ':focus .block-editor-button-block-appender' );
 		await page.waitForSelector( ':focus.block-editor-inserter__search' );
 		await page.keyboard.type( 'Paragraph' );
 		await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
@@ -48,8 +51,8 @@ describe( 'Writing Flow', () => {
 		// TODO: ArrowDown should traverse into the second column. In slower
 		// CPUs, it can sometimes remain in the first column paragraph. This
 		// is a temporary solution.
-		await page.focus( '.wp-block[data-type="core/column"]:nth-child(2)' );
-		await page.click( ':focus .block-editor-button-block-appender' );
+		await frame.focus( '.wp-block[data-type="core/column"]:nth-child(2)' );
+		await frame.click( ':focus .block-editor-button-block-appender' );
 		await page.waitForSelector( ':focus.block-editor-inserter__search' );
 		await page.keyboard.type( 'Paragraph' );
 		await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
@@ -65,7 +68,7 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'ArrowUp' );
 		activeBlockName = await getActiveBlockName();
 		expect( activeBlockName ).toBe( 'core/paragraph' );
-		activeElementText = await page.evaluate(
+		activeElementText = await frame.evaluate(
 			() => document.activeElement.textContent
 		);
 		expect( activeElementText ).toBe( '2nd col' );
@@ -78,7 +81,7 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'ArrowUp' );
 		activeBlockName = await getActiveBlockName();
 		expect( activeBlockName ).toBe( 'core/paragraph' );
-		activeElementText = await page.evaluate(
+		activeElementText = await frame.evaluate(
 			() => document.activeElement.textContent
 		);
 		expect( activeElementText ).toBe( '1st col' );
@@ -87,14 +90,14 @@ describe( 'Writing Flow', () => {
 		// columns wrappers before escaping out.
 		let activeElementBlockType;
 		await page.keyboard.press( 'ArrowUp' );
-		activeElementBlockType = await page.evaluate( () =>
+		activeElementBlockType = await frame.evaluate( () =>
 			document.activeElement.getAttribute( 'data-type' )
 		);
 		expect( activeElementBlockType ).toBe( 'core/column' );
 		activeBlockName = await getActiveBlockName();
 		expect( activeBlockName ).toBe( 'core/column' );
 		await page.keyboard.press( 'ArrowUp' );
-		activeElementBlockType = await page.evaluate( () =>
+		activeElementBlockType = await frame.evaluate( () =>
 			document.activeElement.getAttribute( 'data-type' )
 		);
 		expect( activeElementBlockType ).toBe( 'core/columns' );
@@ -106,7 +109,7 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'ArrowUp' );
 		activeBlockName = await getActiveBlockName();
 		expect( activeBlockName ).toBe( 'core/paragraph' );
-		activeElementText = await page.evaluate(
+		activeElementText = await frame.evaluate(
 			() => document.activeElement.textContent
 		);
 		expect( activeElementText ).toBe( 'First paragraph' );
@@ -260,26 +263,30 @@ describe( 'Writing Flow', () => {
 	it( 'should navigate native inputs vertically, not horizontally', async () => {
 		// See: https://github.com/WordPress/gutenberg/issues/9626
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// Title is within the editor's writing flow, and is a <textarea>
-		await page.click( '.editor-post-title' );
+		await frame.click( '.editor-post-title' );
 
 		// Should remain in title upon ArrowRight:
 		await page.keyboard.press( 'ArrowRight' );
-		let isInTitle = await page.evaluate(
+		let isInTitle = await frame.evaluate(
 			() => !! document.activeElement.closest( '.editor-post-title' )
 		);
 		expect( isInTitle ).toBe( true );
 
 		// Should remain in title upon modifier + ArrowDown:
 		await pressKeyWithModifier( 'primary', 'ArrowDown' );
-		isInTitle = await page.evaluate(
+		isInTitle = await frame.evaluate(
 			() => !! document.activeElement.closest( '.editor-post-title' )
 		);
 		expect( isInTitle ).toBe( true );
 
 		// Should navigate into blocks list upon ArrowDown:
 		await page.keyboard.press( 'ArrowDown' );
-		const isInBlock = await page.evaluate(
+		const isInBlock = await frame.evaluate(
 			() => !! document.activeElement.closest( '[data-type]' )
 		);
 		expect( isInBlock ).toBe( true );
@@ -352,14 +359,18 @@ describe( 'Writing Flow', () => {
 	} );
 
 	it( 'should navigate contenteditable with padding', async () => {
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		await clickBlockAppender();
 		await page.keyboard.press( 'Enter' );
-		await page.evaluate( () => {
+		await frame.evaluate( () => {
 			document.activeElement.style.paddingTop = '100px';
 		} );
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.type( '1' );
-		await page.evaluate( () => {
+		await frame.evaluate( () => {
 			document.activeElement.style.paddingBottom = '100px';
 		} );
 		await page.keyboard.press( 'ArrowDown' );
@@ -474,9 +485,13 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.type( '2' );
 		await page.keyboard.press( 'ArrowUp' );
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// Find a point outside the paragraph between the blocks where it's
 		// expected that the sibling inserter would be placed.
-		const paragraph = await page.$( '[data-type="core/paragraph"]' );
+		const paragraph = await frame.$( '[data-type="core/paragraph"]' );
 		const paragraphRect = await paragraph.boundingBox();
 		const x = paragraphRect.x + ( 2 * paragraphRect.width ) / 3;
 		const y = paragraphRect.y + paragraphRect.height + 1;
@@ -504,9 +519,13 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// Find a point outside the paragraph between the blocks where it's
 		// expected that the sibling inserter would be placed.
-		const paragraph = await page.$( '[data-type="core/paragraph"]' );
+		const paragraph = await frame.$( '[data-type="core/paragraph"]' );
 		const paragraphRect = await paragraph.boundingBox();
 		const x = paragraphRect.x + ( 2 * paragraphRect.width ) / 3;
 		const y = paragraphRect.y + paragraphRect.height + 1;

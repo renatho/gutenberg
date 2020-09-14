@@ -124,7 +124,7 @@ class Editor extends Component {
 							>
 								<ErrorBoundary onError={ onError }>
 									<EditorInitialization postId={ postId } />
-									<Layout />
+									<Layout settings={ editorSettings } />
 									<KeyboardShortcuts
 										shortcuts={ preventEventDiscovery }
 									/>

@@ -16,8 +16,11 @@ describe( 'Editing modes (visual/HTML)', () => {
 	} );
 
 	it( 'should switch between visual and HTML modes', async () => {
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
 		// This block should be in "visual" mode by default.
-		let visualBlock = await page.$$(
+		let visualBlock = await frame.$$(
 			'.block-editor-block-list__layout .block-editor-block-list__block.rich-text'
 		);
 		expect( visualBlock ).toHaveLength( 1 );
@@ -34,7 +37,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		await changeModeButton.click();
 
 		// Wait for the block to be converted to HTML editing mode.
-		const htmlBlock = await page.$$(
+		const htmlBlock = await frame.$$(
 			'.block-editor-block-list__layout .block-editor-block-list__block .block-editor-block-list__block-html-textarea'
 		);
 		expect( htmlBlock ).toHaveLength( 1 );
@@ -51,7 +54,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		await changeModeButton.click();
 
 		// This block should be in "visual" mode by default.
-		visualBlock = await page.$$(
+		visualBlock = await frame.$$(
 			'.block-editor-block-list__layout .block-editor-block-list__block.rich-text'
 		);
 		expect( visualBlock ).toHaveLength( 1 );
@@ -89,8 +92,12 @@ describe( 'Editing modes (visual/HTML)', () => {
 		);
 		await changeModeButton.click();
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// Make sure the paragraph content is rendered as expected.
-		let htmlBlockContent = await page.$eval(
+		let htmlBlockContent = await frame.$eval(
 			'.block-editor-block-list__layout .block-editor-block-list__block .block-editor-block-list__block-html-textarea',
 			( node ) => node.textContent
 		);
@@ -106,7 +113,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		);
 
 		// Make sure the HTML content updated.
-		htmlBlockContent = await page.$eval(
+		htmlBlockContent = await frame.$eval(
 			'.block-editor-block-list__layout .block-editor-block-list__block .block-editor-block-list__block-html-textarea',
 			( node ) => node.textContent
 		);

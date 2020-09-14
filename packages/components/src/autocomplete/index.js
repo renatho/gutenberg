@@ -139,8 +139,18 @@ function filterOptions( search, options = [], maxResults = 10 ) {
 	return filtered;
 }
 
+function getActiveWindow( doc ) {
+	const { activeElement } = doc;
+
+	if ( activeElement.nodeName === 'IFRAME' ) {
+		return getActiveWindow( activeElement.contentDocument );
+	}
+
+	return doc.defaultView;
+}
+
 function getRange() {
-	const selection = window.getSelection();
+	const selection = getActiveWindow( document ).getSelection();
 	return selection.rangeCount ? selection.getRangeAt( 0 ) : null;
 }
 

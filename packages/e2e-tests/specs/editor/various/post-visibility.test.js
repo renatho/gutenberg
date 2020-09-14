@@ -39,8 +39,12 @@ describe( 'Post visibility', () => {
 	it( 'visibility remains private even if the publish date is in the future', async () => {
 		await createNewPost();
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// Enter a title for this post.
-		await page.type( '.editor-post-title__input', 'Title' );
+		await frame.type( '.editor-post-title__input', 'Title' );
 
 		await openDocumentSettingsSidebar();
 
@@ -61,7 +65,7 @@ describe( 'Post visibility', () => {
 		await privateLabel.click();
 
 		// Enter a title for this post.
-		await page.type( '.editor-post-title__input', ' Changed' );
+		await frame.type( '.editor-post-title__input', ' Changed' );
 
 		await page.click( '.editor-post-publish-button' );
 

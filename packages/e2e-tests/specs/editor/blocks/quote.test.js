@@ -61,7 +61,10 @@ describe( 'Quote', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
 		await page.keyboard.down( 'Shift' );
-		await page.click( '[data-type="core/paragraph"]' );
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+		await frame.click( '[data-type="core/paragraph"]' );
 		await page.keyboard.up( 'Shift' );
 		await transformBlockTo( 'Quote' );
 
@@ -158,10 +161,13 @@ describe( 'Quote', () => {
 		await page.keyboard.type( 'cite' );
 		await transformBlockTo( 'Heading' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
-		await page.click( '[data-type="core/quote"]' );
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+		await frame.click( '[data-type="core/quote"]' );
 		await transformBlockTo( 'Heading' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
-		await page.click( '[data-type="core/quote"]' );
+		await frame.click( '[data-type="core/quote"]' );
 		await transformBlockTo( 'Heading' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

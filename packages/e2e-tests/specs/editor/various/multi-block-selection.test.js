@@ -11,7 +11,10 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 async function getSelectedFlatIndices() {
-	return await page.evaluate( () => {
+	const frame = await page
+		.frames()
+		.find( ( f ) => f.name() === 'editor-content' );
+	return await frame.evaluate( () => {
 		const indices = [];
 		let single;
 
@@ -35,9 +38,12 @@ async function getSelectedFlatIndices() {
  * Tests if the native selection matches the block selection.
  */
 async function testNativeSelection() {
+	const frame = await page
+		.frames()
+		.find( ( f ) => f.name() === 'editor-content' );
 	// Wait for the selection to update.
 	await page.evaluate( () => new Promise( window.requestAnimationFrame ) );
-	await page.evaluate( () => {
+	await frame.evaluate( () => {
 		const selection = window.getSelection();
 		const elements = Array.from(
 			document.querySelectorAll( '.is-multi-selected' )
@@ -259,7 +265,10 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
 		await page.keyboard.down( 'Shift' );
-		await page.click( '[data-type="core/paragraph"]' );
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+		await frame.click( '[data-type="core/paragraph"]' );
 		await page.keyboard.up( 'Shift' );
 
 		await testNativeSelection();
@@ -273,20 +282,25 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.type( '2' );
 		await page.keyboard.press( 'ArrowUp' );
 
-		const [ coord1, coord2 ] = await page.evaluate( () => {
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
+		const [ coord1, coord2 ] = await frame.evaluate( () => {
 			const elements = Array.from(
 				document.querySelectorAll( '[data-type="core/paragraph"]' )
 			);
 			const rect1 = elements[ 0 ].getBoundingClientRect();
 			const rect2 = elements[ 1 ].getBoundingClientRect();
+			const winRect = window.frameElement.getBoundingClientRect();
 			return [
 				{
-					x: rect1.x + rect1.width / 2,
-					y: rect1.y + rect1.height / 2,
+					x: winRect.x + rect1.x + rect1.width / 2,
+					y: winRect.y + rect1.y + rect1.height / 2,
 				},
 				{
-					x: rect2.x + rect2.width / 2,
-					y: rect2.y + rect2.height / 2,
+					x: winRect.x + rect2.x + rect2.width / 2,
+					y: winRect.y + rect2.y + rect2.height / 2,
 				},
 			];
 		} );
@@ -306,23 +320,28 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/cover' );
 		await page.keyboard.press( 'Enter' );
-		await page.click( '.components-circular-option-picker__option' );
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+		await frame.click( '.components-circular-option-picker__option' );
 		await page.keyboard.type( '2' );
 
-		const [ coord1, coord2 ] = await page.evaluate( () => {
+		const [ coord1, coord2 ] = await frame.evaluate( () => {
 			const elements = Array.from(
 				document.querySelectorAll( '[data-type="core/paragraph"]' )
 			);
+			elements[ 0 ].scrollIntoView();
 			const rect1 = elements[ 0 ].getBoundingClientRect();
 			const rect2 = elements[ 1 ].getBoundingClientRect();
+			const winRect = window.frameElement.getBoundingClientRect();
 			return [
 				{
-					x: rect1.x + rect1.width / 2,
-					y: rect1.y + rect1.height / 2,
+					x: winRect.x + rect1.x + rect1.width / 2,
+					y: winRect.y + rect1.y + rect1.height / 2,
 				},
 				{
-					x: rect2.x + rect2.width / 2,
-					y: rect2.y + rect2.height / 2,
+					x: winRect.x + rect2.x + rect2.width / 2,
+					y: winRect.y + rect2.y + rect2.height / 2,
 				},
 			];
 		} );
@@ -378,7 +397,11 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.type( '2' );
 		await page.keyboard.press( 'ArrowLeft' );
 
-		const [ coord1, coord2 ] = await page.evaluate( () => {
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
+		const [ coord1, coord2 ] = await frame.evaluate( () => {
 			const selection = window.getSelection();
 
 			if ( ! selection.rangeCount ) {
@@ -391,16 +414,17 @@ describe( 'Multi-block selection', () => {
 				'[data-type="core/paragraph"]'
 			);
 			const rect2 = element.getBoundingClientRect();
+			const winRect = window.frameElement.getBoundingClientRect();
 
 			return [
 				{
-					x: rect1.x,
-					y: rect1.y + rect1.height / 2,
+					x: winRect.x + rect1.x,
+					y: winRect.y + rect1.y + rect1.height / 2,
 				},
 				{
 					// Move a bit outside the paragraph.
-					x: rect2.x - 10,
-					y: rect2.y + rect2.height / 2,
+					x: winRect.x + rect2.x - 10,
+					y: winRect.y + rect2.y + rect2.height / 2,
 				},
 			];
 		} );
@@ -429,20 +453,25 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '3' );
 
-		const [ coord1, coord2 ] = await page.evaluate( () => {
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
+		const [ coord1, coord2 ] = await frame.evaluate( () => {
 			const elements = Array.from(
 				document.querySelectorAll( '[data-type="core/paragraph"]' )
 			);
 			const rect1 = elements[ 2 ].getBoundingClientRect();
 			const rect2 = elements[ 1 ].getBoundingClientRect();
+			const winRect = window.frameElement.getBoundingClientRect();
 			return [
 				{
-					x: rect1.x + rect1.width / 2,
-					y: rect1.y + rect1.height / 2,
+					x: winRect.x + rect1.x + rect1.width / 2,
+					y: winRect.y + rect1.y + rect1.height / 2,
 				},
 				{
-					x: rect2.x + rect2.width / 2,
-					y: rect2.y + rect2.height / 2,
+					x: winRect.x + rect2.x + rect2.width / 2,
+					y: winRect.y + rect2.y + rect2.height / 2,
 				},
 			];
 		} );
@@ -473,14 +502,19 @@ describe( 'Multi-block selection', () => {
 		await testNativeSelection();
 		expect( await getSelectedFlatIndices() ).toEqual( [ 1, 2 ] );
 
-		const coord = await page.evaluate( () => {
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
+		const coord = await frame.evaluate( () => {
 			const element = document.querySelector(
 				'[data-type="core/paragraph"]'
 			);
 			const rect = element.getBoundingClientRect();
+			const winRect = window.frameElement.getBoundingClientRect();
 			return {
-				x: rect.x - 1,
-				y: rect.y + rect.height / 2,
+				x: winRect.x + rect.x - 1,
+				y: winRect.y + rect.y + rect.height / 2,
 			};
 		} );
 

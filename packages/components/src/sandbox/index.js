@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { Component, renderToString, createRef } from '@wordpress/element';
-import { withGlobalEvents } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -26,6 +25,18 @@ class Sandbox extends Component {
 
 	componentDidMount() {
 		this.trySandbox();
+		const { ownerDocument } = this.iframe.current;
+		const { defaultView } = ownerDocument;
+		defaultView.addEventListener( 'message', this.checkMessageForResize );
+	}
+
+	componentWillUnmount() {
+		const { ownerDocument } = this.iframe.current;
+		const { defaultView } = ownerDocument;
+		defaultView.removeEventListener(
+			'message',
+			this.checkMessageForResize
+		);
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -54,7 +65,7 @@ class Sandbox extends Component {
 		}
 
 		// Verify that the mounted element is the source of the message
-		if ( ! iframe || iframe.contentWindow !== event.source ) {
+		if ( ! iframe || iframe !== event.source.frameElement ) {
 			return;
 		}
 
@@ -240,9 +251,5 @@ class Sandbox extends Component {
 		);
 	}
 }
-
-Sandbox = withGlobalEvents( {
-	message: 'checkMessageForResize',
-} )( Sandbox );
 
 export default Sandbox;

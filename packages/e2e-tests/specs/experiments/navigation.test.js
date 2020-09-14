@@ -104,8 +104,11 @@ async function updateActiveNavigationLink( { url, label, type } ) {
 	}
 
 	if ( label ) {
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
 		// Wait for rich text editor input to be focused before we start typing the label
-		await page.waitForSelector( ':focus.rich-text' );
+		await frame.waitForSelector( ':focus.rich-text' );
 
 		// With https://github.com/WordPress/gutenberg/pull/19686, we're auto-selecting the label if the label is URL-ish.
 		// In this case, it means we have to select and delete the label if it's _not_ the url.
@@ -153,12 +156,16 @@ describe( 'Navigation', () => {
 		// Add the navigation block.
 		await insertBlock( 'Navigation' );
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// Create an empty nav block. The 'create' button is disabled until pages are loaded,
 		// so we must wait for it to become not-disabled.
-		await page.waitForXPath(
+		await frame.waitForXPath(
 			'//button[text()="Create from all top-level pages"][not(@disabled)]'
 		);
-		const [ createFromExistingButton ] = await page.$x(
+		const [ createFromExistingButton ] = await frame.$x(
 			'//button[text()="Create from all top-level pages"][not(@disabled)]'
 		);
 		await createFromExistingButton.click();
@@ -171,9 +178,13 @@ describe( 'Navigation', () => {
 		// Add the navigation block.
 		await insertBlock( 'Navigation' );
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// Create an empty nav block.
-		await page.waitForSelector( '.wp-block-navigation-placeholder' );
-		const [ createEmptyButton ] = await page.$x(
+		await frame.waitForSelector( '.wp-block-navigation-placeholder' );
+		const [ createEmptyButton ] = await frame.$x(
 			'//button[text()="Create empty"]'
 		);
 		await createEmptyButton.click();
@@ -191,7 +202,7 @@ describe( 'Navigation', () => {
 		// Add another Navigation Link block.
 		// Using 'click' here checks for regressions of https://github.com/WordPress/gutenberg/issues/18329,
 		// an issue where the block appender requires two clicks.
-		await page.click( '.wp-block-navigation .block-list-appender' );
+		await frame.click( '.wp-block-navigation .block-list-appender' );
 
 		// After adding a new block, search input should be shown immediately.
 		// Verify that Escape would close the popover.
@@ -210,7 +221,7 @@ describe( 'Navigation', () => {
 		);
 		expect( isInURLInput ).toBe( true );
 		await page.keyboard.press( 'Escape' );
-		const isInLinkRichText = await page.evaluate(
+		const isInLinkRichText = await frame.evaluate(
 			() =>
 				document.activeElement.classList.contains( 'rich-text' ) &&
 				!! document.activeElement.closest(
@@ -256,9 +267,13 @@ describe( 'Navigation', () => {
 		// Add the navigation block.
 		await insertBlock( 'Navigation' );
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// Create an empty nav block.
-		await page.waitForSelector( '.wp-block-navigation-placeholder' );
-		const [ createEmptyButton ] = await page.$x(
+		await frame.waitForSelector( '.wp-block-navigation-placeholder' );
+		const [ createEmptyButton ] = await frame.$x(
 			'//button[text()="Create empty"]'
 		);
 		await createEmptyButton.click();
@@ -300,10 +315,10 @@ describe( 'Navigation', () => {
 		await createPageButton.click();
 
 		// wait for the creating confirmation to go away, and we should now be focused on our text input
-		await page.waitForSelector( ':focus.rich-text' );
+		await frame.waitForSelector( ':focus.rich-text' );
 
 		// Confirm the new link is focused.
-		const isInLinkRichText = await page.evaluate(
+		const isInLinkRichText = await frame.evaluate(
 			() =>
 				document.activeElement.classList.contains( 'rich-text' ) &&
 				!! document.activeElement.closest(

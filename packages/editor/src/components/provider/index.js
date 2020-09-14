@@ -12,10 +12,7 @@ import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { EntityProvider } from '@wordpress/core-data';
-import {
-	BlockEditorProvider,
-	__unstableEditorStyles as EditorStyles,
-} from '@wordpress/block-editor';
+import { BlockEditorProvider } from '@wordpress/block-editor';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -185,7 +182,6 @@ class EditorProvider extends Component {
 
 		return (
 			<>
-				<EditorStyles styles={ settings.styles } />
 				<EntityProvider kind="root" type="site">
 					<EntityProvider
 						kind="postType"

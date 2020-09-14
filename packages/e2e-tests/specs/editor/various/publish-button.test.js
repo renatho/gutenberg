@@ -32,7 +32,10 @@ describe( 'PostPublishButton', () => {
 	} );
 
 	it( 'should be disabled when post is being saved', async () => {
-		await page.type( '.editor-post-title__input', 'E2E Test Post' ); // Make it saveable
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+		await frame.type( '.editor-post-title__input', 'E2E Test Post' ); // Make it saveable
 		expect(
 			await page.$( '.editor-post-publish-button[aria-disabled="true"]' )
 		).toBeNull();
@@ -44,7 +47,10 @@ describe( 'PostPublishButton', () => {
 	} );
 
 	it( 'should be disabled when metabox is being saved', async () => {
-		await page.type( '.editor-post-title__input', 'E2E Test Post' ); // Make it saveable
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+		await frame.type( '.editor-post-title__input', 'E2E Test Post' ); // Make it saveable
 		expect(
 			await page.$( '.editor-post-publish-button[aria-disabled="true"]' )
 		).toBeNull();

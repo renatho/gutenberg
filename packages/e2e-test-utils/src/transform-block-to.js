@@ -21,8 +21,14 @@ export async function transformBlockTo( name ) {
 	await insertButton.evaluate( ( element ) => element.scrollIntoView() );
 	await insertButton.click();
 
+	const frame = await page
+		.frames()
+		.find( ( f ) => f.name() === 'editor-content' );
+
 	// Wait for the transformed block to appear.
 	const BLOCK_SELECTOR = '.block-editor-block-list__block';
 	const BLOCK_NAME_SELECTOR = `[data-title="${ name }"]`;
-	await page.waitForSelector( `${ BLOCK_SELECTOR }${ BLOCK_NAME_SELECTOR }` );
+	await frame.waitForSelector(
+		`${ BLOCK_SELECTOR }${ BLOCK_NAME_SELECTOR }`
+	);
 }

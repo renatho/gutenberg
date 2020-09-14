@@ -31,7 +31,10 @@ describe( 'Group', () => {
 	it( 'can have other blocks appended to it using the button appender', async () => {
 		await searchForBlock( 'Group' );
 		await page.click( '.editor-block-list-item-group' );
-		await page.click( '.block-editor-button-block-appender' );
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+		await frame.click( '.block-editor-button-block-appender' );
 		await page.click( '.editor-block-list-item-paragraph' );
 		await page.keyboard.type( 'Group Block with a Paragraph' );
 

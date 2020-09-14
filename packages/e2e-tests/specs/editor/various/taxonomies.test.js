@@ -107,8 +107,12 @@ describe( 'Taxonomies', () => {
 		expect( selectedCategories ).toHaveLength( 1 );
 		expect( selectedCategories[ 0 ] ).toEqual( 'z rand category 1' );
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// Type something in the title so we can publish the post.
-		await page.type( '.editor-post-title__input', 'Hello World' );
+		await frame.type( '.editor-post-title__input', 'Hello World' );
 
 		// Publish the post.
 		await publishPost();
@@ -168,8 +172,12 @@ describe( 'Taxonomies', () => {
 		expect( tags ).toHaveLength( 1 );
 		expect( tags[ 0 ] ).toEqual( tagName );
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// Type something in the title so we can publish the post.
-		await page.type( '.editor-post-title__input', 'Hello World' );
+		await frame.type( '.editor-post-title__input', 'Hello World' );
 
 		// Publish the post.
 		await publishPost();

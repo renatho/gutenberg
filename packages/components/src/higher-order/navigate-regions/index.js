@@ -50,10 +50,23 @@ export default createHigherOrderComponent( ( WrappedComponent ) => {
 		] );
 		const focusNext = useCallback( () => focusRegion( 1 ), [ container ] );
 
+		const contentWindow = window.frames[ 'editor-content' ];
+
 		useKeyboardShortcut( shortcuts.previous, focusPrevious, {
 			bindGlobal: true,
 		} );
 		useKeyboardShortcut( shortcuts.next, focusNext, { bindGlobal: true } );
+
+		useKeyboardShortcut( shortcuts.previous, focusPrevious, {
+			bindGlobal: true,
+			isDisabled: ! contentWindow,
+			altWindow: contentWindow,
+		} );
+		useKeyboardShortcut( shortcuts.next, focusNext, {
+			bindGlobal: true,
+			isDisabled: ! contentWindow,
+			altWindow: contentWindow,
+		} );
 
 		// Disable reason: Clicking the editor should dismiss the regions focus style
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */

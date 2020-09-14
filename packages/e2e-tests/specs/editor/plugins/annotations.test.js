@@ -55,7 +55,10 @@ describe( 'Using Plugins API', () => {
 			await page.$x( "//button[contains(text(), 'Add annotation')]" )
 		 )[ 0 ];
 		await addAnnotationButton.click();
-		await page.evaluate( () =>
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+		await frame.evaluate( () =>
 			document.querySelector( '[contenteditable]' ).focus()
 		);
 	}
@@ -71,7 +74,10 @@ describe( 'Using Plugins API', () => {
 			await page.$x( "//button[contains(text(), 'Remove annotations')]" )
 		 )[ 0 ];
 		await addAnnotationButton.click();
-		await page.evaluate( () =>
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+		await frame.evaluate( () =>
 			document.querySelector( '[contenteditable]' ).focus()
 		);
 	}
@@ -82,11 +88,14 @@ describe( 'Using Plugins API', () => {
 	 * @return {Promise<string>} The annotated text.
 	 */
 	async function getAnnotatedText() {
-		const annotations = await page.$$( ANNOTATIONS_SELECTOR );
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+		const annotations = await frame.$$( ANNOTATIONS_SELECTOR );
 
 		const annotation = annotations[ 0 ];
 
-		return await page.evaluate( ( el ) => el.innerText, annotation );
+		return await frame.evaluate( ( el ) => el.innerText, annotation );
 	}
 
 	/**
@@ -95,8 +104,11 @@ describe( 'Using Plugins API', () => {
 	 * @return {Promise<string>} Inner HTML.
 	 */
 	async function getRichTextInnerHTML() {
-		const htmlContent = await page.$$( '*[contenteditable]' );
-		return await page.evaluate( ( el ) => {
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+		const htmlContent = await frame.$$( '*[contenteditable]' );
+		return await frame.evaluate( ( el ) => {
 			return el.innerHTML;
 		}, htmlContent[ 0 ] );
 	}
@@ -109,12 +121,16 @@ describe( 'Using Plugins API', () => {
 
 			await clickOnMoreMenuItem( 'Annotations Sidebar' );
 
-			let annotations = await page.$$( ANNOTATIONS_SELECTOR );
+			const frame = await page
+				.frames()
+				.find( ( f ) => f.name() === 'editor-content' );
+
+			let annotations = await frame.$$( ANNOTATIONS_SELECTOR );
 			expect( annotations ).toHaveLength( 0 );
 
 			await annotateFirstBlock( 9, 13 );
 
-			annotations = await page.$$( ANNOTATIONS_SELECTOR );
+			annotations = await frame.$$( ANNOTATIONS_SELECTOR );
 			expect( annotations ).toHaveLength( 1 );
 
 			const text = await getAnnotatedText();
@@ -122,10 +138,10 @@ describe( 'Using Plugins API', () => {
 
 			await clickOnBlockSettingsMenuItem( 'Edit as HTML' );
 
-			const htmlContent = await page.$$(
+			const htmlContent = await frame.$$(
 				'.block-editor-block-list__block-html-textarea'
 			);
-			const html = await page.evaluate( ( el ) => {
+			const html = await frame.evaluate( ( el ) => {
 				return el.innerHTML;
 			}, htmlContent[ 0 ] );
 
@@ -142,9 +158,13 @@ describe( 'Using Plugins API', () => {
 			// The selection should still be at the end, so test that by typing:
 			await page.keyboard.type( 'D' );
 
+			const frame = await page
+				.frames()
+				.find( ( f ) => f.name() === 'editor-content' );
+
 			await removeAnnotations();
-			const htmlContent = await page.$$( '*[contenteditable]' );
-			const html = await page.evaluate( ( el ) => {
+			const htmlContent = await frame.$$( '*[contenteditable]' );
+			const html = await frame.evaluate( ( el ) => {
 				return el.innerHTML;
 			}, htmlContent[ 0 ] );
 

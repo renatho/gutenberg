@@ -53,21 +53,25 @@ describe( 'Reusable blocks', () => {
 		// Give the reusable block a title
 		await page.keyboard.type( 'Greeting block' );
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// Save the reusable block
-		const [ saveButton ] = await page.$x( '//button[text()="Save"]' );
+		const [ saveButton ] = await frame.$x( '//button[text()="Save"]' );
 		await saveButton.click();
 
 		// Wait for saving to finish
-		await page.waitForXPath( '//button[text()="Edit"]' );
+		await frame.waitForXPath( '//button[text()="Edit"]' );
 
 		// Check that we have a reusable block on the page
-		const block = await page.$(
+		const block = await frame.$(
 			'.block-editor-block-list__block[data-type="core/block"]'
 		);
 		expect( block ).not.toBeNull();
 
 		// Check that its title is displayed
-		const title = await page.$eval(
+		const title = await frame.$eval(
 			'.reusable-block-edit-panel__info',
 			( element ) => element.innerText
 		);
@@ -91,21 +95,25 @@ describe( 'Reusable blocks', () => {
 			'//*[contains(@class, "components-snackbar")]/*[text()="Block created."]'
 		);
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// Save the reusable block
-		const [ saveButton ] = await page.$x( '//button[text()="Save"]' );
+		const [ saveButton ] = await frame.$x( '//button[text()="Save"]' );
 		await saveButton.click();
 
 		// Wait for saving to finish
-		await page.waitForXPath( '//button[text()="Edit"]' );
+		await frame.waitForXPath( '//button[text()="Edit"]' );
 
 		// Check that we have a reusable block on the page
-		const block = await page.$(
+		const block = await frame.$(
 			'.block-editor-block-list__block[data-type="core/block"]'
 		);
 		expect( block ).not.toBeNull();
 
 		// Check that it is untitled
-		const title = await page.$eval(
+		const title = await frame.$eval(
 			'.reusable-block-edit-panel__info',
 			( element ) => element.innerText
 		);
@@ -116,8 +124,12 @@ describe( 'Reusable blocks', () => {
 		// Insert the reusable block we created above
 		await insertBlock( 'Greeting block' );
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// Put the reusable block in edit mode
-		const editButton = await page.waitForXPath(
+		const editButton = await frame.waitForXPath(
 			'//button[text()="Edit" and not(@disabled)]'
 		);
 		await editButton.click();
@@ -137,27 +149,27 @@ describe( 'Reusable blocks', () => {
 		await page.keyboard.type( 'Oh! ' );
 
 		// Save the reusable block
-		const [ saveButton ] = await page.$x( '//button[text()="Save"]' );
+		const [ saveButton ] = await frame.$x( '//button[text()="Save"]' );
 		await saveButton.click();
 
 		// Wait for saving to finish
-		await page.waitForXPath( '//button[text()="Edit"]' );
+		await frame.waitForXPath( '//button[text()="Edit"]' );
 
 		// Check that we have a reusable block on the page
-		const block = await page.$(
+		const block = await frame.$(
 			'.block-editor-block-list__block[data-type="core/block"]'
 		);
 		expect( block ).not.toBeNull();
 
 		// Check that its title is displayed
-		const title = await page.$eval(
+		const title = await frame.$eval(
 			'.reusable-block-edit-panel__info',
 			( element ) => element.innerText
 		);
 		expect( title ).toBe( 'Surprised greeting block' );
 
 		// Check that its content is up to date
-		const text = await page.$eval(
+		const text = await frame.$eval(
 			'.block-editor-block-list__block[data-type="core/block"] p',
 			( element ) => element.innerText
 		);
@@ -175,14 +187,18 @@ describe( 'Reusable blocks', () => {
 		);
 		await convertButton.click();
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// Check that we have a paragraph block on the page
-		const block = await page.$(
+		const block = await frame.$(
 			'.block-editor-block-list__block[data-type="core/paragraph"]'
 		);
 		expect( block ).not.toBeNull();
 
 		// Check that its content is up to date
-		const text = await page.$eval(
+		const text = await frame.$eval(
 			'.block-editor-block-list__block[data-type="core/paragraph"]',
 			( element ) => element.innerText
 		);
@@ -249,21 +265,25 @@ describe( 'Reusable blocks', () => {
 		// Give the reusable block a title
 		await page.keyboard.type( 'Multi-selection reusable block' );
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// Save the reusable block
-		const [ saveButton ] = await page.$x( '//button[text()="Save"]' );
+		const [ saveButton ] = await frame.$x( '//button[text()="Save"]' );
 		await saveButton.click();
 
 		// Wait for saving to finish
-		await page.waitForXPath( '//button[text()="Edit"]' );
+		await frame.waitForXPath( '//button[text()="Edit"]' );
 
 		// Check that we have a reusable block on the page
-		const block = await page.$(
+		const block = await frame.$(
 			'.block-editor-block-list__block[data-type="core/block"]'
 		);
 		expect( block ).not.toBeNull();
 
 		// Check that its title is displayed
-		const title = await page.$eval(
+		const title = await frame.$eval(
 			'.reusable-block-edit-panel__info',
 			( element ) => element.innerText
 		);

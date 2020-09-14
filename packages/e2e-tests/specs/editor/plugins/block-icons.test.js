@@ -16,8 +16,8 @@ const INSERTER_ICON_WRAPPER_SELECTOR = `${ INSERTER_BUTTON_SELECTOR } .block-edi
 const INSERTER_ICON_SELECTOR = `${ INSERTER_BUTTON_SELECTOR } .block-editor-block-icon`;
 const INSPECTOR_ICON_SELECTOR = '.edit-post-sidebar .block-editor-block-icon';
 
-async function getInnerHTML( selector ) {
-	return await page.$eval( selector, ( element ) => element.innerHTML );
+async function getInnerHTML( selector, frame = page ) {
+	return await frame.$eval( selector, ( element ) => element.innerHTML );
 }
 
 async function getBackgroundColor( selector ) {
@@ -80,9 +80,13 @@ describe( 'Correctly Renders Block Icons on Inserter and Inspector', () => {
 
 		it( 'Can insert the block', async () => {
 			await insertBlock( blockTitle );
+			const frame = await page
+				.frames()
+				.find( ( f ) => f.name() === 'editor-content' );
 			expect(
 				await getInnerHTML(
-					`[data-type="${ blockName }"] [data-type="core/paragraph"]`
+					`[data-type="${ blockName }"] [data-type="core/paragraph"]`,
+					frame
 				)
 			).toEqual( blockTitle );
 		} );

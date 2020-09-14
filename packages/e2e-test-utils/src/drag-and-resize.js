@@ -16,8 +16,24 @@ export async function dragAndResize( element, delta ) {
 		height: elementHeight,
 	} = await element.boundingBox();
 
-	const originX = elementX + elementWidth / 2;
-	const originY = elementY + elementHeight / 2;
+	const frame = await page
+		.frames()
+		.find( ( f ) => f.name() === 'editor-content' );
+
+	const windowRect = await frame.evaluate( () => {
+		if ( window.frameElement ) {
+			return { x: 0, y: 0 };
+		}
+
+		const winRect = window.frameElement.getBoundingClientRect();
+		return {
+			x: winRect.x,
+			y: winRect.y,
+		};
+	} );
+
+	const originX = windowRect.x + elementX + elementWidth / 2;
+	const originY = windowRect.y + elementY + elementHeight / 2;
 
 	await page.mouse.move( originX, originY );
 	await page.mouse.down();

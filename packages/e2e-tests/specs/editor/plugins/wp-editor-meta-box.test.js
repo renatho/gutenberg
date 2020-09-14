@@ -19,8 +19,11 @@ describe( 'WP Editor Meta Boxes', () => {
 	} );
 
 	it( 'Should save the changes', async () => {
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
 		// Add title to enable valid non-empty post save.
-		await page.type( '.editor-post-title__input', 'Hello Meta' );
+		await frame.type( '.editor-post-title__input', 'Hello Meta' );
 
 		// Type something
 		await expect( page ).toClick( '#test_tinymce_id-html' );

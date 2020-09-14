@@ -103,12 +103,14 @@ function BlockPopover( {
 
 	let node = blockNodes[ clientId ];
 
-	if ( capturingClientId ) {
-		node = document.getElementById( 'block-' + capturingClientId );
-	}
-
 	if ( ! node ) {
 		return null;
+	}
+
+	const { ownerDocument } = node;
+
+	if ( capturingClientId ) {
+		node = ownerDocument.getElementById( 'block-' + capturingClientId );
 	}
 
 	// A block may specify a different target element for the toolbar.
@@ -148,6 +150,9 @@ function BlockPopover( {
 	const popoverPosition = showEmptyBlockSideInserter
 		? 'top left right'
 		: 'top right left';
+	const stickyEl = showEmptyBlockSideInserter
+		? undefined
+		: ownerDocument.defaultView.frameElement;
 
 	return (
 		<Popover
@@ -157,7 +162,7 @@ function BlockPopover( {
 			focusOnMount={ false }
 			anchorRef={ anchorRef }
 			className="block-editor-block-list__block-popover"
-			__unstableSticky={ ! showEmptyBlockSideInserter }
+			__unstableSticky={ stickyEl }
 			__unstableSlotName="block-toolbar"
 			__unstableBoundaryParent
 			// Allow subpixel positioning for the block movement animation.

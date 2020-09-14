@@ -24,8 +24,11 @@ describe( 'new editor filtered state', () => {
 	} );
 
 	it( 'should respect default content', async () => {
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
 		// get the values that should have their defaults changed.
-		const title = await page.$eval(
+		const title = await frame.$eval(
 			'.editor-post-title__input',
 			( element ) => element.innerHTML
 		);

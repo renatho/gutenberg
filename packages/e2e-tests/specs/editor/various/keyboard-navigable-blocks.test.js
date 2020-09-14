@@ -11,9 +11,18 @@ import {
 
 async function getActiveLabel() {
 	return await page.evaluate( () => {
+		function getActiveElement( { activeElement } ) {
+			if ( activeElement.nodeName === 'IFRAME' ) {
+				return getActiveElement( activeElement.contentDocument );
+			}
+			return activeElement;
+		}
+
+		const activeElement = getActiveElement( document );
+
 		return (
-			document.activeElement.getAttribute( 'aria-label' ) ||
-			document.activeElement.innerHTML
+			activeElement.getAttribute( 'aria-label' ) ||
+			activeElement.innerHTML
 		);
 	} );
 }
@@ -22,6 +31,7 @@ const navigateToContentEditorTop = async () => {
 	// Use 'Ctrl+`' to return to the top of the editor
 	await pressKeyWithModifier( 'ctrl', '`' );
 	await pressKeyWithModifier( 'ctrl', '`' );
+	await expect( await getActiveLabel() ).toBe( 'Editor content' );
 };
 
 const tabThroughParagraphBlock = async ( paragraphText ) => {
@@ -33,8 +43,11 @@ const tabThroughParagraphBlock = async ( paragraphText ) => {
 
 	await page.keyboard.press( 'Tab' );
 	await expect( await getActiveLabel() ).toBe( 'Paragraph block' );
+	const frame = await page
+		.frames()
+		.find( ( f ) => f.name() === 'editor-content' );
 	await expect(
-		await page.evaluate( () => document.activeElement.innerHTML )
+		await frame.evaluate( () => document.activeElement.innerHTML )
 	).toBe( paragraphText );
 
 	await page.keyboard.press( 'Tab' );
@@ -110,14 +123,18 @@ describe( 'Order of block keyboard navigation', () => {
 			await page.keyboard.type( paragraphBlock );
 		}
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// Clear the selected block and put focus in front of the block list.
-		await page.evaluate( () => {
-			document.querySelector( '.edit-post-visual-editor' ).focus();
+		await frame.evaluate( () => {
+			document.body.firstElementChild.focus();
 		} );
 
 		await page.keyboard.press( 'Tab' );
 		await expect(
-			await page.evaluate( () => {
+			await frame.evaluate( () => {
 				return document.activeElement.placeholder;
 			} )
 		).toBe( 'Add title' );
@@ -145,9 +162,15 @@ describe( 'Order of block keyboard navigation', () => {
 			await page.keyboard.type( paragraphBlock );
 		}
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// Clear the selected block and put focus behind the block list.
+		await frame.evaluate( () => {
+			document.body.firstElementChild.focus();
+		} );
 		await page.evaluate( () => {
-			document.querySelector( '.edit-post-visual-editor' ).focus();
 			document
 				.querySelector( '.block-editor-editor-skeleton__sidebar' )
 				.focus();
@@ -165,10 +188,13 @@ describe( 'Order of block keyboard navigation', () => {
 
 		await pressKeyWithModifier( 'shift', 'Tab' );
 		await expect(
-			await page.evaluate( () => {
+			await frame.evaluate( () => {
 				return document.activeElement.placeholder;
 			} )
 		).toBe( 'Add title' );
+
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		await expect( await getActiveLabel() ).toBe( 'More tools & options' );
 	} );
 
 	it( 'should navigate correctly with multi selection', async () => {

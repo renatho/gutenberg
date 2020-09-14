@@ -98,8 +98,12 @@ describe( 'Container block without paragraph support', () => {
 	it( 'ensures we can use the alternative block appender properly', async () => {
 		await insertBlock( 'Container without paragraph' );
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// Open the specific appender used when there's no paragraph support.
-		await page.click(
+		await frame.click(
 			'.block-editor-inner-blocks .block-list-appender .block-list-appender__toggle'
 		);
 

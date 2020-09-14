@@ -48,7 +48,7 @@ import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
 import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
 import WelcomeGuide from '../welcome-guide';
 
-function Layout() {
+function Layout( { settings } ) {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const {
 		closePublishSidebar,
@@ -156,7 +156,7 @@ function Layout() {
 								<TextEditor />
 							) }
 							{ isRichEditingEnabled && mode === 'visual' && (
-								<VisualEditor />
+								<VisualEditor settings={ settings } />
 							) }
 							<div className="edit-post-layout__metaboxes">
 								<MetaBoxes location="normal" />

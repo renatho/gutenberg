@@ -37,7 +37,10 @@ describe( 'Test Custom Post Types', () => {
 	it( 'It should be able to create an hierarchical post without title support', async () => {
 		// Create a parent post.
 		await createNewPost( { postType: 'hierar-no-title' } );
-		await page.click( '.block-editor-writing-flow' );
+		let frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+		await frame.click( '.block-editor-writing-flow' );
 		await page.keyboard.type( 'Parent Post' );
 		await publishPost();
 		// Create a post that is a child of the previously created post.
@@ -52,7 +55,10 @@ describe( 'Test Custom Post Types', () => {
 			'.editor-page-attributes__parent select',
 			valueToSelect
 		);
-		await page.click( '.block-editor-writing-flow' );
+		frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+		await frame.click( '.block-editor-writing-flow' );
 		await page.keyboard.type( 'Child Post' );
 		await publishPost();
 		// Reload the child post and verify it is still correctly selected as a child post.

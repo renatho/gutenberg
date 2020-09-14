@@ -33,7 +33,10 @@ describe( 'Using Hooks API', () => {
 	it( 'Pressing reset block button resets the block', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'First paragraph' );
-		const paragraphContent = await page.$eval(
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+		const paragraphContent = await frame.$eval(
 			'p[data-type="core/paragraph"]',
 			( element ) => element.textContent
 		);

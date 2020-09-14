@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { getScrollContainer } from '@wordpress/dom';
-
-/**
  * Module constants
  */
 const HEIGHT_OFFSET = 10; // used by the arrow and a bit of empty space
@@ -163,9 +158,7 @@ export function computePopoverYAxisPosition(
 	const { height } = contentSize;
 
 	if ( sticky ) {
-		const scrollContainerEl =
-			getScrollContainer( anchorRef ) || document.body;
-		const scrollRect = scrollContainerEl.getBoundingClientRect();
+		const scrollRect = sticky.getBoundingClientRect();
 
 		if ( anchorRect.top - height <= scrollRect.top ) {
 			return {

@@ -43,6 +43,7 @@ function isKeyDownEligibleForStartTyping( event ) {
 }
 
 function ObserveTyping( { children, setTimeout: setSafeTimeout } ) {
+	const ref = useRef();
 	const lastMouseMove = useRef();
 	const isTyping = useSelect( ( select ) =>
 		select( 'core/block-editor' ).isTyping()
@@ -61,9 +62,13 @@ function ObserveTyping( { children, setTimeout: setSafeTimeout } ) {
 	 */
 	function toggleEventBindings( isBound ) {
 		const bindFn = isBound ? 'addEventListener' : 'removeEventListener';
-		document[ bindFn ](
+		ref.current.ownerDocument[ bindFn ](
 			'selectionchange',
 			stopTypingOnSelectionUncollapse
+		);
+		ref.current.ownerDocument[ bindFn ](
+			'mousemove',
+			stopTypingOnMouseMove
 		);
 		document[ bindFn ]( 'mousemove', stopTypingOnMouseMove );
 	}
@@ -96,8 +101,8 @@ function ObserveTyping( { children, setTimeout: setSafeTimeout } ) {
 	 * On selection change, unset typing flag if user has made an uncollapsed
 	 * (shift) selection.
 	 */
-	function stopTypingOnSelectionUncollapse() {
-		const selection = window.getSelection();
+	function stopTypingOnSelectionUncollapse( { target } ) {
+		const selection = target.defaultView.getSelection();
 		const isCollapsed =
 			selection.rangeCount > 0 && selection.getRangeAt( 0 ).collapsed;
 
@@ -176,6 +181,7 @@ function ObserveTyping( { children, setTimeout: setSafeTimeout } ) {
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
 		<div
+			ref={ ref }
 			onFocus={ stopTypingOnNonTextField }
 			onKeyPress={ startTypingInTextField }
 			onKeyDown={ over( [

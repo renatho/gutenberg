@@ -6,3 +6,24 @@
 .block-editor-writing-flow__click-redirect {
 	cursor: text;
 }
+
+.editor-styles-wrapper,
+.editor-styles-wrapper > div,
+.editor-styles-wrapper > div > .components-drop-zone__provider,
+.editor-styles-wrapper > div > .components-drop-zone__provider > .block-editor__typewriter,
+.editor-styles-wrapper > div > .components-drop-zone__provider > .block-editor__typewriter > div,
+.editor-styles-wrapper > div > .components-drop-zone__provider > .block-editor__typewriter > div > .block-editor-writing-flow,
+.editor-styles-wrapper > div > .components-drop-zone__provider > .block-editor__typewriter > div > .block-editor-writing-flow > .block-editor-writing-flow__click-redirect {
+	height: 100%;
+}
+
+.block-editor-writing-flow__click-redirect,
+.editor-styles-wrapper > div:focus {
+	outline: none;
+}
+
+.block-editor-writing-flow__click-redirect {
+	// Allow the page to be scrolled with the last block in the middle.
+	min-height: 40vh;
+	width: 100%;
+}

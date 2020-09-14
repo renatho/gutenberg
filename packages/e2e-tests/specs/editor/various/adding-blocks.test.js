@@ -40,11 +40,17 @@ describe( 'adding blocks', () => {
 		// of any potential buggy behavior with the "stretched" click redirect.
 		await setBrowserViewport( { width: 960, height: 1400 } );
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// Click below editor to focus last field (block appender)
 		await clickAtBottom(
 			await page.$( '.block-editor-editor-skeleton__content' )
 		);
-		expect( await page.$( '[data-type="core/paragraph"]' ) ).not.toBeNull();
+		expect(
+			await frame.$( '[data-type="core/paragraph"]' )
+		).not.toBeNull();
 		await page.keyboard.type( 'Paragraph block' );
 
 		// Using the slash command
@@ -91,10 +97,10 @@ describe( 'adding blocks', () => {
 		await page.keyboard.type( 'lines preserved[/myshortcode]' );
 
 		// Unselect blocks to avoid conflicts with the inbetween inserter
-		await page.click( '.editor-post-title__input' );
+		await frame.click( '.editor-post-title__input' );
 
 		// Using the between inserter
-		const insertionPoint = await page.$( '[data-type="core/quote"]' );
+		const insertionPoint = await frame.$( '[data-type="core/quote"]' );
 		const rect = await insertionPoint.boundingBox();
 		await page.mouse.move( rect.x + rect.width / 2, rect.y - 10, {
 			steps: 10,

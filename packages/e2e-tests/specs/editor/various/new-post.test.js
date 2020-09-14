@@ -24,8 +24,11 @@ describe( 'new editor state', () => {
 		expect( page.url() ).toEqual(
 			expect.stringContaining( 'post-new.php' )
 		);
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
 		// Should display the blank title.
-		const title = await page.$( '[placeholder="Add title"]' );
+		const title = await frame.$( '[placeholder="Add title"]' );
 		expect( title ).not.toBeNull();
 		expect( title.innerHTML ).toBeFalsy();
 		// Should display the Preview button.
@@ -51,10 +54,13 @@ describe( 'new editor state', () => {
 	} );
 
 	it( 'should focus the title if the title is empty', async () => {
-		const activeElementClasses = await page.evaluate( () => {
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+		const activeElementClasses = await frame.evaluate( () => {
 			return Object.values( document.activeElement.classList );
 		} );
-		const activeElementTagName = await page.evaluate( () => {
+		const activeElementTagName = await frame.evaluate( () => {
 			return document.activeElement.tagName.toLowerCase();
 		} );
 
@@ -63,18 +69,25 @@ describe( 'new editor state', () => {
 	} );
 
 	it( 'should not focus the title if the title exists', async () => {
+		let frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
 		// Enter a title for this post.
-		await page.type( '.editor-post-title__input', 'Here is the title' );
+		await frame.type( '.editor-post-title__input', 'Here is the title' );
 		// Save the post as a draft.
 		await page.click( '.editor-post-save-draft' );
 		await page.waitForSelector( '.editor-post-saved-state.is-saved' );
 		// Reload the browser so a post is loaded with a title.
 		await page.reload();
 
-		const activeElementClasses = await page.evaluate( () => {
+		frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
+		const activeElementClasses = await frame.evaluate( () => {
 			return Object.values( document.activeElement.classList );
 		} );
-		const activeElementTagName = await page.evaluate( () => {
+		const activeElementTagName = await frame.evaluate( () => {
 			return document.activeElement.tagName.toLowerCase();
 		} );
 

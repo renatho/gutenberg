@@ -83,7 +83,10 @@ describe( 'Heading', () => {
 		await page.click( COLOR_INPUT_FIELD_SELECTOR );
 		await pressKeyWithModifier( 'primary', 'A' );
 		await page.keyboard.type( '#7700ff' );
-		await page.click( 'h3[data-type="core/heading"]' );
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+		await frame.click( 'h3[data-type="core/heading"]' );
 		await page.waitForSelector(
 			'.component-color-indicator[aria-label="(Color: #7700ff)"]'
 		);
@@ -101,7 +104,10 @@ describe( 'Heading', () => {
 		const colorButtonSelector = `//button[@aria-label='Color: Luminous vivid orange']`;
 		const [ colorButton ] = await page.$x( colorButtonSelector );
 		await colorButton.click();
-		await page.click( 'h2[data-type="core/heading"]' );
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+		await frame.click( 'h2[data-type="core/heading"]' );
 		await page.waitForXPath(
 			`${ colorButtonSelector }[@aria-pressed='true']`
 		);

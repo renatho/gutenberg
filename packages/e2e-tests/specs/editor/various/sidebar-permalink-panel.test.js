@@ -37,8 +37,11 @@ describe( 'Sidebar Permalink Panel', () => {
 		await createNewPost( { postType: 'public_q_not_public' } );
 		await page.keyboard.type( 'aaaaa' );
 		await publishPost();
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
 		// Start editing again.
-		await page.type( '.editor-post-title__input', ' (Updated)' );
+		await frame.type( '.editor-post-title__input', ' (Updated)' );
 		expect(
 			await findSidebarPanelWithTitle( 'Permalink' )
 		).toBeUndefined();
@@ -48,8 +51,11 @@ describe( 'Sidebar Permalink Panel', () => {
 		await createNewPost( { postType: 'not_public_q_public' } );
 		await page.keyboard.type( 'aaaaa' );
 		await publishPost();
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
 		// Start editing again.
-		await page.type( '.editor-post-title__input', ' (Updated)' );
+		await frame.type( '.editor-post-title__input', ' (Updated)' );
 		expect(
 			await findSidebarPanelWithTitle( 'Permalink' )
 		).toBeUndefined();
@@ -59,8 +65,11 @@ describe( 'Sidebar Permalink Panel', () => {
 		await createNewPost( { postType: 'public_q_public' } );
 		await page.keyboard.type( 'aaaaa' );
 		await publishPost();
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
 		// Start editing again.
-		await page.type( '.editor-post-title__input', ' (Updated)' );
+		await frame.type( '.editor-post-title__input', ' (Updated)' );
 		expect( await findSidebarPanelWithTitle( 'Permalink' ) ).toBeDefined();
 	} );
 } );

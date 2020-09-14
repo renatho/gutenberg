@@ -58,6 +58,7 @@ const BlockDraggable = ( { children, clientIds } ) => {
 	return (
 		<Draggable
 			elementId={ blockElementId }
+			window={ window.frames[ 'editor-content' ] }
 			transferData={ transferData }
 			onDragStart={ () => {
 				startDraggingBlocks();

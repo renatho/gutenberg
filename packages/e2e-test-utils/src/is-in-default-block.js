@@ -5,7 +5,14 @@
  */
 export function isInDefaultBlock() {
 	return page.evaluate( () => {
-		const activeElement = document.activeElement;
+		function getActiveElement( { activeElement } ) {
+			if ( activeElement.nodeName === 'IFRAME' ) {
+				return getActiveElement( activeElement.contentDocument );
+			}
+			return activeElement;
+		}
+
+		const activeElement = getActiveElement( document );
 		// activeElement may be null in that case we should return false
 		if ( ! activeElement ) {
 			return false;

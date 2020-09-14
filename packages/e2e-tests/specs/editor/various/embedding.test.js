@@ -164,7 +164,10 @@ describe( 'Embedding content', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'https://twitter.com/notnownikki' );
 		await page.keyboard.press( 'Enter' );
-		await page.waitForSelector( 'figure.wp-block-embed-twitter' );
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+		await frame.waitForSelector( 'figure.wp-block-embed-twitter' );
 
 		// Valid provider; invalid content. Should render failed, edit state.
 		await clickBlockAppender();
@@ -174,7 +177,7 @@ describe( 'Embedding content', () => {
 			'https://twitter.com/wooyaygutenberg123454312'
 		);
 		await page.keyboard.press( 'Enter' );
-		await page.waitForSelector(
+		await frame.waitForSelector(
 			'input[value="https://twitter.com/wooyaygutenberg123454312"]'
 		);
 
@@ -184,7 +187,7 @@ describe( 'Embedding content', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'https://wordpress.org/gutenberg/handbook/' );
 		await page.keyboard.press( 'Enter' );
-		await page.waitForSelector(
+		await frame.waitForSelector(
 			'input[value="https://wordpress.org/gutenberg/handbook/"]'
 		);
 
@@ -195,7 +198,7 @@ describe( 'Embedding content', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'https://twitter.com/thatbunty' );
 		await page.keyboard.press( 'Enter' );
-		await page.waitForSelector(
+		await frame.waitForSelector(
 			'input[value="https://twitter.com/thatbunty"]'
 		);
 
@@ -208,7 +211,7 @@ describe( 'Embedding content', () => {
 			'https://wordpress.org/gutenberg/handbook/block-api/attributes/'
 		);
 		await page.keyboard.press( 'Enter' );
-		await page.waitForSelector( 'figure.wp-block-embed-wordpress' );
+		await frame.waitForSelector( 'figure.wp-block-embed-wordpress' );
 
 		// Video content. Should render valid figure element, and include the
 		// aspect ratio class.
@@ -219,7 +222,7 @@ describe( 'Embedding content', () => {
 			'https://www.youtube.com/watch?v=lXMskKTw3Bc'
 		);
 		await page.keyboard.press( 'Enter' );
-		await page.waitForSelector(
+		await frame.waitForSelector(
 			'figure.wp-block-embed-youtube.wp-embed-aspect-16-9'
 		);
 
@@ -241,15 +244,19 @@ describe( 'Embedding content', () => {
 		);
 		await page.keyboard.press( 'Enter' );
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// Wait for the request to fail and present an error. Since placeholder
 		// has styles applied which depend on resize observer, wait for the
 		// expected size class to settle before clicking, since otherwise a race
 		// condition could occur on the placeholder layout vs. click intent.
-		await page.waitForSelector(
+		await frame.waitForSelector(
 			'.components-placeholder.is-large .components-placeholder__error'
 		);
 
-		await clickButton( 'Convert to link' );
+		await clickButton( 'Convert to link', frame );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -260,8 +267,11 @@ describe( 'Embedding content', () => {
 		// This URL can't be embedded, but without the trailing slash, it can.
 		await page.keyboard.type( 'https://twitter.com/notnownikki/' );
 		await page.keyboard.press( 'Enter' );
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
 		// The twitter block should appear correctly.
-		await page.waitForSelector( 'figure.wp-block-embed-twitter' );
+		await frame.waitForSelector( 'figure.wp-block-embed-twitter' );
 	} );
 
 	it( 'should allow the user to try embedding a failed URL again', async () => {
@@ -274,11 +284,15 @@ describe( 'Embedding content', () => {
 		);
 		await page.keyboard.press( 'Enter' );
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// Wait for the request to fail and present an error. Since placeholder
 		// has styles applied which depend on resize observer, wait for the
 		// expected size class to settle before clicking, since otherwise a race
 		// condition could occur on the placeholder layout vs. click intent.
-		await page.waitForSelector(
+		await frame.waitForSelector(
 			'.components-placeholder.is-large .components-placeholder__error'
 		);
 
@@ -293,8 +307,8 @@ describe( 'Embedding content', () => {
 				),
 			},
 		] );
-		await clickButton( 'Try again' );
-		await page.waitForSelector( 'figure.wp-block-embed-twitter' );
+		await clickButton( 'Try again', frame );
+		await frame.waitForSelector( 'figure.wp-block-embed-twitter' );
 	} );
 
 	it( 'should switch to the WordPress block correctly', async () => {
@@ -319,7 +333,11 @@ describe( 'Embedding content', () => {
 		await page.keyboard.type( postUrl );
 		await page.keyboard.press( 'Enter' );
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// Check the block has become a WordPress block.
-		await page.waitForSelector( '.wp-block-embed-wordpress' );
+		await frame.waitForSelector( '.wp-block-embed-wordpress' );
 	} );
 } );

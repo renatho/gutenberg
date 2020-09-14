@@ -613,6 +613,48 @@ function gutenberg_extend_block_editor_styles( $settings ) {
 add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_styles' );
 
 /**
+ * Extends block editor settings to include Gutenberg's editor style html.
+ *
+ * @param array $settings Default editor settings.
+ *
+ * @return array Filtered editor settings.
+ */
+function gutenberg_extend_block_editor_styles_html( $settings ) {
+	$handles = array(
+		'wp-block-editor',
+		'wp-block-library',
+		'wp-edit-blocks',
+	);
+
+	$block_registry = WP_Block_Type_Registry::get_instance();
+
+	foreach ( $block_registry->get_all_registered() as $block_name => $block_type ) {
+		if ( ! empty( $block_type->style ) ) {
+			$handles[] = $block_type->style;
+		}
+
+		if ( ! empty( $block_type->editor_style ) ) {
+			$handles[] = $block_type->editor_style;
+		}
+	}
+
+	$handles = array_unique( $handles );
+	$done = wp_styles()->done;
+
+	ob_start();
+
+	wp_styles()->done = array();
+	wp_styles()->do_items( $handles );
+	wp_styles()->done = $done;
+
+	$editor_styles = wp_json_encode( array( 'html' => ob_get_clean() ) );
+
+	echo "<script>window.__editorStyles = $editor_styles</script>";
+}
+add_action( 'admin_footer-post.php', 'gutenberg_extend_block_editor_styles_html' );
+add_action( 'admin_footer-post-new.php', 'gutenberg_extend_block_editor_styles_html' );
+
+/**
  * Load a block pattern by name.
  *
  * @param string $name Block Pattern File name.

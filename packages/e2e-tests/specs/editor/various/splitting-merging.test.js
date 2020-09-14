@@ -193,9 +193,13 @@ describe( 'splitting and merging blocks', () => {
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.press( 'Backspace' );
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// There is a default block:
 		expect(
-			await page.$$( '.block-editor-block-list__block' )
+			await frame.$$( '.block-editor-block-list__block' )
 		).toHaveLength( 1 );
 
 		// But the effective saved content is still empty:

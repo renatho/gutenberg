@@ -9,14 +9,17 @@ describe( 'block mover', () => {
 	} );
 
 	it( 'should show block mover when more than one block exists', async () => {
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
 		// Create a two blocks on the page.
-		await page.click( '.block-editor-default-block-appender' );
+		await frame.click( '.block-editor-default-block-appender' );
 		await page.keyboard.type( 'First Paragraph' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Second Paragraph' );
 
 		// Select a block so the block mover is rendered.
-		await page.focus( '.block-editor-block-list__block' );
+		await frame.focus( '.block-editor-block-list__block' );
 
 		// Move the mouse to show the block toolbar
 		await page.mouse.move( 0, 0 );
@@ -28,12 +31,15 @@ describe( 'block mover', () => {
 	} );
 
 	it( 'should hide block mover when only one block exists', async () => {
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
 		// Create a single block on the page.
-		await page.click( '.block-editor-default-block-appender' );
+		await frame.click( '.block-editor-default-block-appender' );
 		await page.keyboard.type( 'First Paragraph' );
 
 		// Select a block so the block mover has the possibility of being rendered.
-		await page.focus( '.block-editor-block-list__block' );
+		await frame.focus( '.block-editor-block-list__block' );
 
 		// Move the mouse to show the block toolbar
 		await page.mouse.move( 0, 0 );
